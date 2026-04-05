@@ -9,7 +9,8 @@ import pandas as pd
 from rag_pipeline import get_retriever
 from google import genai
 
-os.environ["GOOGLE_API_KEY"] = "REDACTED" # Get one from https://aistudio.google.com/app/apikey
+if not os.environ.get("GOOGLE_API_KEY"):
+    raise RuntimeError("GOOGLE_API_KEY environment variable is not set.")
 
 # ─── Session Store ───────────────────────────────────────────────────────────
 _sessions = {}
