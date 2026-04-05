@@ -1,0 +1,16 @@
+
+    MEDICAL GUIDELINES & LITERATURE
+    
+    Type 2 Diabetes Treatments:
+    First-line therapy for Type 2 Diabetes is generally Metformin. For patients with high cardiovascular risk, SGLT2 inhibitors (e.g., Empagliflozin) or GLP-1 receptor agonists (e.g., Liraglutide) are recommended. 
+    Lifestyle modifications including weight loss (targeting BMI < 25), dietary changes, and regular exercise (150 minutes/week) are universally advised.
+    
+    Hypertension Management:
+    For patients with blood pressure over 140/90, first-line antihypertensive medications include ACE inhibitors (e.g., Lisinopril), ARBs (e.g., Losartan), Calcium Channel Blockers (e.g., Amlodipine), or Thiazide diuretics.
+    
+    Hyperlipidemia:
+    Statins (e.g., Atorvastatin, Rosuvastatin) are indicated for patients with LDL cholesterol levels notably over 190 mg/dL, or those with significant cardiovascular risk factors. 
+    
+    General Risk Profiling:
+    A combination of elevated Glucose, BMI > 30, and Blood Pressure > 140 points heavily towards Metabolic Syndrome and preemptive risk for severe diabetic complications.
+    
