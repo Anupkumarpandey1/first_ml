@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
-
+import html2pdf from 'html2pdf.js';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
@@ -262,6 +262,30 @@ function AnalysisDashboard({ sessionId, patientInfo, extractedData, analysis }) 
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  const downloadPDF = () => {
+    const element = document.getElementById('report-content');
+    const opt = {
+      margin:       0.5,
+      filename:     `${patientInfo.name}_Health_Report.pdf`,
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2 },
+      jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+    html2pdf().set(opt).from(element).save();
+  };
+
+  const handleTTS = (text) => {
+    if (!window.speechSynthesis) return alert("Text-to-speech not supported in your browser.");
+    window.speechSynthesis.cancel(); // Stop any currently playing audio
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 1.0;
+    utterance.pitch = 1.0;
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const healthScore = Math.max(0, 100 - ((analysis.concerning_findings?.length || 0) * 10) - ((analysis.disease_risks?.length || 0) * 15));
+
+
   const sendMessage = async (e) => {
     e.preventDefault();
     if (!chatInput.trim()) return;
@@ -299,8 +323,8 @@ function AnalysisDashboard({ sessionId, patientInfo, extractedData, analysis }) 
   return (
     <div className="analysis-layout fade-in">
       {/* Left: Analysis */}
-      <div className="analysis-panel">
-        <div className="analysis-header">
+      <div className="analysis-panel" id="report-content">
+        <div className="analysis-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div className="patient-badge-large">
             <div className="avatar">{patientInfo.name?.charAt(0)?.toUpperCase()}</div>
             <div>
@@ -308,6 +332,9 @@ function AnalysisDashboard({ sessionId, patientInfo, extractedData, analysis }) 
               <span>{patientInfo.age} yrs • {patientInfo.gender} • BMI: {patientInfo.bmi}</span>
             </div>
           </div>
+          <button className="btn-secondary" onClick={downloadPDF} style={{ padding: '0.5rem 1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', backgroundColor: 'var(--panel-bg)', border: '1px solid var(--panel-border)', borderRadius: '8px', cursor: 'pointer', color: 'var(--text-main)', transition: 'all 0.2s' }}>
+            📄 Download PDF
+          </button>
         </div>
 
         {/* Summary */}
@@ -340,6 +367,19 @@ function AnalysisDashboard({ sessionId, patientInfo, extractedData, analysis }) 
           {/* Overview Tab */}
           {activeTab === 'overview' && (
             <div className="overview-grid">
+              {/* Health Score Component */}
+              <div className="stat-card span-full" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1.5rem', background: 'linear-gradient(135deg, rgba(63,185,80,0.1) 0%, rgba(88,166,255,0.1) 100%)', border: '1px solid rgba(63,185,80,0.2)' }}>
+                <div>
+                  <h4 style={{ margin: 0, fontSize: '1.2rem', color: 'var(--text-main)' }}>Overall Wellness Score</h4>
+                  <p style={{ margin: '0.5rem 0 0 0', color: 'var(--text-muted)', fontSize: '0.9rem' }}>Based on analyzed report parameters</p>
+                </div>
+                <div style={{ position: 'relative', width: '80px', height: '80px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', background: `conic-gradient(${healthScore > 80 ? '#3fb950' : healthScore > 50 ? '#d29922' : '#f85149'} ${healthScore}%, transparent 0)` }}>
+                  <div style={{ position: 'absolute', width: '70px', height: '70px', backgroundColor: 'var(--panel-bg)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--text-main)' }}>
+                    {healthScore}
+                  </div>
+                </div>
+              </div>
+
               <div className="stat-card good">
                 <div className="stat-number">{analysis.good_findings?.length || 0}</div>
                 <div className="stat-label">Normal Parameters</div>
@@ -467,6 +507,11 @@ function AnalysisDashboard({ sessionId, patientInfo, extractedData, analysis }) 
                 <div className="msg-text">
                   <ReactMarkdown>{m.text}</ReactMarkdown>
                 </div>
+                {m.role === 'ai' && (
+                  <button className="btn-tts" onClick={() => handleTTS(m.text)} title="Read Aloud" style={{ background: 'none', border: 'none', cursor: 'pointer', opacity: 0.6, fontSize: '1.2rem', padding: '0.2rem', marginTop: '0.5rem' }}>
+                    🔊
+                  </button>
+                )}
               </div>
             </div>
           ))}
