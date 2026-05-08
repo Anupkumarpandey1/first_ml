@@ -4,9 +4,6 @@ import base64
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.tools import tool
 from langgraph.prebuilt import create_react_agent
-import joblib
-import pandas as pd
-from rag_pipeline import get_retriever
 from google import genai
 
 if not os.environ.get("GOOGLE_API_KEY"):
@@ -160,6 +157,8 @@ IMPORTANT:
 
 # ─── ML Risk Prediction (kept for backward compatibility) ───────────────────
 def load_patient_risk(medical_data: dict) -> str:
+    import joblib
+    import pandas as pd
     try:
         model = joblib.load("risk_model.pkl")
         scaler = joblib.load("scaler.pkl")
@@ -208,6 +207,7 @@ def patient_profile_retrieval(query: str) -> str:
 @tool
 def medical_literature_search(query: str) -> str:
     """Use this tool when you need to search medical guidelines, clinical treatments, drug recommendations, or research literature for a specific condition, symptom, or risk profile. Input should describe the medical topic to search for."""
+    from rag_pipeline import get_retriever
     retriever = get_retriever()
     docs = retriever.invoke(query)
     if not docs:
